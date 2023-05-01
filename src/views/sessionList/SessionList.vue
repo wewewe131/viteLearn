@@ -1,8 +1,11 @@
 <template>
     <div class="msgMain">
         <div class="messageList">
-            <div id="leftslider" ref="leftslider" v-if="sessionList[0]?.avatar" class="messageItem"
-                v-for="(item) in sessionList">
+            <div @click="$router
+                    .push('/layout/chat/' + item.id)" id="leftslider" ref="leftslider" v-if="sessionList[0]?.avatar"
+                class="messageItem" v-for="(item, index) in sessionList" :key="index">
+                <!-- {{ index }}
+                {{ item.index }} -->
                 <img :src="config.filePath + 'avatar/' + item.avatar" height="50" width="50" alt="">
                 <div class="info">
                     <div class="messageName">{{ item.receiveName }}</div>
@@ -37,14 +40,19 @@ async function getSessionList() {
     await invoke('get_login_user_id_command').then(async uid => {
         console.log(uid);
         await session.getSessionList().then(async session => {
+            console.log(session.data.data);
+
             if (!session.data.data) return
-            await session.data.data.map(async (v: any) => {
+            await session.data.data.map(async (v: any, index: any) => {
+                console.log('map输出', v);
+                v['index'] = index
                 v.userId = v.userId + ''
                 v.receiveId = v.receiveId + ''
                 if (v.sessionType == 'friend') {
-                    let id = v.userId == v.receiveId ? v.receiveId : v.userId;
+                    let id = uid == v.receiveId ? v.userId : v.receiveId;
                     await friend.getUserInfo(id).then(friendRes => {
                         v['avatar'] = friendRes.data.data.uavatar
+                        v.receiveName = friendRes.data.data.uname
                     })
                 }
                 if (v.sessionType == 'group') {
@@ -52,10 +60,14 @@ async function getSessionList() {
                         v['avatar'] = groupRes.data.data.group.groupAvatar
                     })
                 }
-                sessionList.value.push(v)
+                sessionList.value = [...sessionList.value, v]
+                sessionList.value = sessionList.value.sort((a: any, b: any) => {
+                    return a.index - b.index
+                })
                 console.log("结果", sessionList.value);
                 return v
             })
+
             console.log(sessionList.value);
             return sessionList
         })
@@ -68,7 +80,7 @@ let router = useRouter()
 onMounted(async () => {
     await getSessionList().then(() => {
         setTimeout(() => {
-            setSlider()
+            // setSlider()
         }, 100);
     })
 })
@@ -76,7 +88,7 @@ let leftslider = ref([] as HTMLDivElement[])
 let x = 0;
 const setSlider = () => {
     console.log(leftslider.value);
-    leftslider.value.forEach(i => {
+    leftslider.value.forEach((i, index) => {
         console.log(i);
         i.addEventListener('mousedown', (e: any) => {
             x = e.pageX
@@ -87,7 +99,7 @@ const setSlider = () => {
             console.log(abs);
 
             if (abs < 10 && i.style.marginLeft != '-50px')
-                router.push('/layout/chat')
+                router.push('/layout/chat/' + sessionList.value[index].sessionId)
 
 
             if (x > e.pageX) {

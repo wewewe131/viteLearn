@@ -178,9 +178,11 @@ function toGroupHandler() {
         sessionType: "group"
     }).then(res => {
         if (res.data.code == 200) {
+            emit('tochat',res)
             console.log(res.data.data);
         }
     })
+    
 }
 
 async function exitGroupHandler() {

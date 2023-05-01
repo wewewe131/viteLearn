@@ -1,45 +1,48 @@
 <template>
-    <div class="chatMain">
+    <div class="chatMain" v-if="sessionInfo.sessionType != ''">
         <div class="chatBox">
             <div class="chatList">
-                <div class="chatItem" v-for="i, index in chatList" :key="index">
+                <div class="chatItem" :style="{ 'flex-direction': i.sendUserId == userInfo.userId ? 'row-reverse' : 'row' }"
+                    v-for="(i, index) in chatList" :key="index">
                     <div class="left">
-                        <img src="../../assets/image/下载.jpg" width="30" alt="">
+                        <img style="border-radius: 50%;" :src="config.filePath + 'avatar/' + i.sendUserAvatar" width="30" alt="">
                     </div>
-                    <div class="right">
-                        <div class="info">
-                            <div class="name">{{ i.uName }}</div>
-                            <div class="time">{{ i.time }}</div>
+                    <div class="right" :style="{ 'flex-direction': i.sendUserId == userInfo.userId ? 'row-reverse' : 'row' }">
+                        <div class="info" :style="{ 'flex-direction': i.sendUserId == userInfo.userId ? 'row-reverse' : 'row' }">
+                            <div class="name">{{ i.sendUser }}</div>
+                            <div class="time">{{ i.createTime }}</div>
                         </div>
-                        <div class="content">{{ i.uContent }}</div>
+                        <div class="content">{{ i.message }}</div>
                     </div>
                 </div>
             </div>
             <div class="inputBox">
                 <div class="messageBox">
-                    <textarea autofocus></textarea>
+                    <textarea v-model="messageText" autofocus></textarea>
                 </div>
                 <div class="activeButton">
-                    <MyButton>发送</MyButton>
+                    <MyButton @click="sendMessage">发送</MyButton>
                     <MyButton>取消</MyButton>
                 </div>
             </div>
         </div>
-        <div class="memberBox">
+        <div class="memberBox" v-if="sessionInfo.sessionType == 'group'">
             <div class="title">群员列表：</div>
             <div class="memberList">
                 <div class="memberItem" v-for="i, index in memberList" :key="index">
                     <div class="left">
-                        <img src="../../assets/image/下载.jpg" width="30" alt="">
-                        <div class="point" :style="{ backgroundColor: i.online ? '#cbff65' : '#999' }">
+                        <img :src="config.filePath + 'avatar/' + i.chatUser.uavatar" width="30" alt="">
+                        <div class="point" :style="{ backgroundColor: i.chatUser.isOnline ? '#cbff65' : '#999' }">
                             <!-- 在线状态显示 -->
+
                         </div>
                     </div>
                     <div class="center">
-                        <div class="name">{{ i.uName }}</div>
+
+                        <div class="name">{{ i.chatUser.uname }}</div>
                     </div>
                     <div class="right">
-                        <el-icon :color="i.role == 'host' ? '#ff7800' : i.role == 'admin' ? '#75D557' : '#FFF'">
+                        <el-icon :color="i.auth == '1' ? '#ff7800' : i.auth == '2' ? '#75D557' : '#FFF'">
                             <UserFilled />
                         </el-icon>
                     </div>
@@ -49,238 +52,119 @@
     </div>
 </template>
 <script lang="ts" setup>
+import message from '@/api/message';
+import session from '@/api/session';
 import MyButton from '@/components/MyButton.vue';
-import type { List } from 'lodash';
-import { reactive, toRefs } from 'vue';
+import { emit, listen } from '@tauri-apps/api/event';
+import { onMounted, reactive, toRefs } from 'vue';
+import { useRoute } from 'vue-router';
+import { UserInfo } from '@/stores/Store';
+import { storeToRefs } from 'pinia';
+import group from '@/api/group';
+import config from '@/config/config';
+
+
+let userStore = UserInfo();
+let { userInfo } = storeToRefs(userStore);
 const state = reactive({
     memberList: [
-        {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        },
-        {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: '123'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: 'admin'
-        }, {
-            uName: '123',
-            uId: '123',
-            uAvatar: '123',
-            online: '123',
-            role: 'host'
-        },
-    ],
+    ] as Member[],
     chatList: [
-        {
-            uName: '123',
-            uContent: 'abc',
-            uAvatar: '123',
-            time: '2023-1-1 12:12:12',
-        },
-        {
-            uName: '123',
-            uContent: '33333333333333333333333333333333333333333333333331311231321213231231321111131223113312223213132123123131213312212332113232112332113231231321223113223131211232332321132131231212312313212331221313212313232211313322133123121322313122131232311233121233213123211322313123125631426534eqw56e411849afsd148afsd148fads148dsaf418dfas418dafs418dafs148adfs841asd48f1as89d4f1as89df41a8s9df41asd894f1asdf4a181a8sdf49fa1sd48d418fasa8sd41faf8s14dsdaf8411a8sdf4dsf41a8a1s8df4af41ds8afsd814',
-            uAvatar: '123',
-            time: '2023-1-1 12:12:12',
-        },
-        {
-            uName: '123',
-            uContent: '33333333333333333333333333333333333333333333333331311231321213231231321111131223113312223213132123123131213312212332113232112332113231231321223113223131211232332321132131231212312313212331221313212313232211313322133123121322313122131232311233121233213123211322313123125631426534eqw56e411849afsd148afsd148fads148dsaf418dfas418dafs418dafs148adfs841asd48f1as89d4f1as89df41a8s9df41asd894f1asdf4a181a8sdf49fa1sd48d418fasa8sd41faf8s14dsdaf8411a8sdf4dsf41a8a1s8df4af41ds8afsd814',
-            uAvatar: '123',
-            time: '2023-1-1 12:12:12',
-        },
-        {
-            uName: '123',
-            uContent: '33333333333333333333333333333333333333333333333331311231321213231231321111131223113312223213132123123131213312212332113232112332113231231321223113223131211232332321132131231212312313212331221313212313232211313322133123121322313122131232311233121233213123211322313123125631426534eqw56e411849afsd148afsd148fads148dsaf418dfas418dafs418dafs148adfs841asd48f1as89d4f1as89df41a8s9df41asd894f1asdf4a181a8sdf49fa1sd48d418fasa8sd41faf8s14dsdaf8411a8sdf4dsf41a8a1s8df4af41ds8afsd814',
-            uAvatar: '123',
-            time: '2023-1-1 12:12:12',
-        },
-        {
-            uName: '123',
-            uContent: '33333333333333333333333333333333333333333333333331311231321213231231321111131223113312223213132123123131213312212332113232112332113231231321223113223131211232332321132131231212312313212331221313212313232211313322133123121322313122131232311233121233213123211322313123125631426534eqw56e411849afsd148afsd148fads148dsaf418dfas418dafs418dafs148adfs841asd48f1as89d4f1as89df41a8s9df41asd894f1asdf4a181a8sdf49fa1sd48d418fasa8sd41faf8s14dsdaf8411a8sdf4dsf41a8a1s8df4af41ds8afsd814',
-            uAvatar: '123',
-            time: '2023-1-1 12:12:12',
-        },
-    ]
+    ] as Message[],
+    sessionInfo: { id: '', sessionType: '', receiveId: '' },
+    messageText: ''
 })
-let { memberList, chatList } = toRefs(state);
+let { memberList, chatList, messageText } = toRefs(state);
+let route = useRoute()
+let { sessionInfo } = toRefs(state)
+onMounted(() => {
+    let id = route.params.sessionId as string
+    session.getSessionInfo(id).then(res => {
+        console.log(res)
+        sessionInfo.value = res.data.data
+    }).then(() => {
+        message.getMessageList(sessionInfo.value.id).then(res => {
+            console.log(res)
+            chatList.value = res.data.data
+            setTimeout(() => {
+                setScroll()
+            }, 0);
+        })
+        group.getGroupInfo(sessionInfo.value.receiveId).then(res => {
+            console.log(res)
+            memberList.value = res.data.data.groupUserInfoVos
+        })
+    })
+
+})
+
+interface Message {
+    sendUserId: string,
+    sendUserAvatar: string,
+    message: string,
+    sendUser: string,
+    sessionId: string,
+    createTime?: string
+}
+interface Session {
+    data: Message,
+    sessionType: string
+}
+interface Member {
+    auth: string,
+    chatUser: ChatUser,
+}
+interface ChatUser {
+    uid: string,
+    uname: string,
+    uavatar: string,
+    usex: string,
+    signature: string,
+    createTime: string,
+    updateTime: string,
+    isOnline: number
+    isDel: 0
+}
+function setScroll() {
+    let chatList = document.querySelector('.chatList') as HTMLElement
+    chatList.scrollTop = chatList.scrollHeight
+}
+function sendMessage() {
+    console.log(sessionInfo.value);
+    let msg: Message = {
+        sendUser: userInfo.value.userName,
+        sendUserId: userInfo.value.userId,
+        sendUserAvatar: userInfo.value.userAvatar,
+        message: messageText.value,
+        sessionId: sessionInfo.value.id
+    };
+    messageText.value = ''
+    emit('send_socket_message', msg)
+}
+listen("new_message", payload => {
+    console.log(payload.payload)
+    let res = payload.payload as Session
+    let message: Message = res.data
+    if (message.sessionId == sessionInfo.value.id) {
+        chatList.value.push(message)
+        setTimeout(() => {
+            setScroll()
+        }, 0);
+    }
+})
 </script>
 <style lang="scss" scoped>
 .chatMain {
     background-color: #fff;
     height: 100%;
     width: 100%;
-    display: grid;
-    grid-template-columns: 3fr 1fr;
+    // display: grid;
+    // grid-template-columns: 3fr 1fr;
+    display: flex;
 
     .chatBox {
+        flex: 3;
+        width: 100%;
         overflow: hidden;
 
         .chatList {
@@ -288,7 +172,7 @@ let { memberList, chatList } = toRefs(state);
             width: 100%;
             border-bottom: 1px solid #e5e5e5;
             overflow-y: scroll;
-
+            padding-right: 10px;
             .chatItem {
                 width: 100%;
                 display: flex;
@@ -297,14 +181,10 @@ let { memberList, chatList } = toRefs(state);
                 .left {
                     display: flex;
                     align-items: start;
-
-
-
                 }
 
                 .right {
                     width: 100%;
-
                     .info {
                         width: 100%;
                         display: flex;
@@ -313,7 +193,7 @@ let { memberList, chatList } = toRefs(state);
                         .name {
                             font-size: 14px;
                             color: #333;
-                            margin-bottom: 5px;
+                            margin: 5px;
                         }
 
                         .time {
@@ -329,7 +209,6 @@ let { memberList, chatList } = toRefs(state);
                         overflow: hidden;
                         background-color: #f1f1f1;
                         border-radius: 5px;
-                        margin-right: 10px;
                         padding: 10px;
                     }
                 }
@@ -363,6 +242,7 @@ let { memberList, chatList } = toRefs(state);
         border-left: 1px solid #e5e5e5;
         height: 100%;
         overflow: hidden;
+        flex: 1;
 
         .memberList {
             overflow-y: scroll;

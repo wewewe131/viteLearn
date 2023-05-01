@@ -11,7 +11,7 @@ const router = createRouter({
       children: [
         {
           // 创建一个聊天框的路由
-          path: 'chat',
+          path: 'chat/:sessionId',
           name: 'chat',
           component: () => import('@/views/chat/ChatView.vue'),
           meta: {

@@ -1,19 +1,21 @@
 <template>
     <div class="setMain">
-        <MyButton size="1" @click="config.logout()">登出</MyButton>
+        <MyButton size="1" @click="logoutHandler">登出</MyButton>
     </div>
 </template>
 <script lang="ts" setup>
+import login from '@/api/login';
 import MyButton from '@/components/MyButton.vue';
 import config from '@/config/config';
 import { UserInfo } from '@/stores/Store';
-import newWindow from '@/views/windowsManager/windosManager';
-import { emit } from '@tauri-apps/api/event';
-import { appWindow } from '@tauri-apps/api/window';
 import { storeToRefs } from 'pinia';
 
 let { userInfo } = storeToRefs(UserInfo())
-
+let logoutHandler = () => {
+    login.logout().then(res => {
+        config.logout()
+    })
+}
 console.log(userInfo.value);
 </script>
 <style lang="scss" scoped>

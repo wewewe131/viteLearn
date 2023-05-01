@@ -4,7 +4,7 @@
 )]
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
-use tauri::{Manager, WindowBuilder, WindowUrl, Window, Runtime};
+use tauri::{Manager, Runtime, Window, WindowBuilder, WindowUrl};
 
 static LOGIN_USER: Mutex<String> = Mutex::new(String::new());
 static SEARCH_ID: Mutex<String> = Mutex::new(String::new());
@@ -43,26 +43,33 @@ fn get_search_id_command() -> String {
 }
 
 #[tauri::command]
-async fn create_window(app: tauri::AppHandle, url: String,label: String,title: String,width: f64,height:f64,fullscreen:bool){
-  let window = tauri::WindowBuilder::new(&app, label, tauri::WindowUrl::App(url.parse().unwrap()))
-    .title(title)
-    .inner_size(width, height)
-    .fullscreen(fullscreen)
-    .center()
-    .resizable(false)
-    .build()
-    .unwrap();
+async fn create_window(
+    app: tauri::AppHandle,
+    url: String,
+    label: String,
+    title: String,
+    width: f64,
+    height: f64,
+    fullscreen: bool,
+) {
+    let window =
+        tauri::WindowBuilder::new(&app, label, tauri::WindowUrl::App(url.parse().unwrap()))
+            .title(title)
+            .inner_size(width, height)
+            .fullscreen(fullscreen)
+            .center()
+            .resizable(false)
+            .build()
+            .unwrap();
 }
 #[tauri::command]
-async fn close_window<R: Runtime>(app: tauri::AppHandle<R>,label: String) -> Result<(), String> {
+async fn close_window<R: Runtime>(app: tauri::AppHandle<R>, label: String) -> Result<(), String> {
     app.get_window(&label).unwrap().close().unwrap();
     Ok(())
 }
 
 #[derive(Serialize, Deserialize)]
-struct Configs {
-
-}
+struct Configs {}
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![

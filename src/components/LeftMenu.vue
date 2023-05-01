@@ -15,7 +15,7 @@ import { useRoute, useRouter } from 'vue-router';
 const state = reactive({
   menuList: [
     {
-      name: "聊天列表",
+      name: "会话列表",
       path: "/layout/sessionList"
     },
     {

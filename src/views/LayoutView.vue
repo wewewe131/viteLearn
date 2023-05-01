@@ -3,7 +3,7 @@
         <div class="left">
             <LeftMenuVue>测试</LeftMenuVue>
             <div class="userinfo" v-if="userInfo.userAvatar">
-                <img height="50" width="50" :src="config.filePath + 'avatar/' + userInfo.userAvatar" alt="">
+                <img v-if="userInfo.userAvatar" height="50" width="50" :src="config.filePath + 'avatar/' + userInfo.userAvatar" alt="">
                 <div class="userinforight">
                     <div class="name">{{ userInfo.userName }}</div>
                     <div class="id">ID: {{ userInfo.userId }}</div>
@@ -20,30 +20,27 @@
 </template>
     
 <script lang='ts' setup>
-// When using the Tauri API npm package:
-// import { invoke } from '@tauri-apps/api/tauri'
-// import { emit, listen } from '@tauri-apps/api/event';
-
 import LeftMenuVue from '@/components/LeftMenu.vue';
 import { getCurrentInstance, onMounted } from 'vue';
-import { RouterView } from 'vue-router';
+import { RouterView, useRouter } from 'vue-router';
 import { UserInfo, ApplyInfo } from "@/stores/Store.js"
 import { storeToRefs } from 'pinia';
 import apply from "@/api/apply"
 import testSocket from '@/utils/resocket'
 import login from '@/api/login';
-import group from '@/api/group';
 import message from '@/utils/Messge';
 import config from '@/config/config';
 import { emit, listen } from '@tauri-apps/api/event';
 import { appWindow } from '@tauri-apps/api/window';
+
 let userInfoStore = UserInfo()
 let applyListStore = ApplyInfo()
 let { applyList } = storeToRefs(applyListStore)
 let { userInfo } = storeToRefs(userInfoStore)
 
 let gParam = getCurrentInstance()?.appContext.config.globalProperties
-// console.log(userInfoStore.getUserInfo);
+
+let route = useRouter()
 
 apply.getApplyInfo().then((res: any) => {
     // console.log(res.data.data);
@@ -53,15 +50,22 @@ apply.getApplyInfo().then((res: any) => {
 
 getUserInfo().then(() => {
     testSocket.socket().then(res => {
+
+        listen("send_socket_message", (data: any) => {
+            let payload: { sendUserId: string, sendUserAvatar: string, message: string, sendUser: string, sessionId: string } = data.payload
+            res.send(JSON.stringify({ "msg": payload, "mode": "message" }))
+        })
+
         res.onopen = () => {
             // console.log("连接成功");
             res.send(JSON.stringify({ "msg": "我是客户端", "mode": "test" }));
         }
 
         res.onmessage = (e) => {
+            // emit("send_socket_message", {sendUserId:'100010', sendUserAvatar:'2fa8d135-d1b0-4264-95fa-3b36f60f0825.webp',message: "新的消息", sendUser: '100010', sessionId: '300ee5d12f74dce23148103b66f37e49' })
             // console.log("收到消息", e.data);
             let res = JSON.parse(e.data)
-            // console.log(res);
+            console.log(res);
             if (res.type == "group" || res.type == "friend") {
                 message(res.type == "group" ? "收到一条入群申请" : "收到一条好友申请", "success")
                 applyListStore.appendApplyList({
@@ -72,6 +76,11 @@ getUserInfo().then(() => {
                     uid: res.uid,
                     userName: res.userName
                 })
+            }
+            if (res.type == "message") {
+                console.log(res);
+                
+                emit("new_message", res)
             }
         }
 
@@ -102,13 +111,20 @@ onMounted(async () => {
     // console.log("调用了Layout的Mounted");
     emit("mainClose")
 })
-
+listen("tochat", ((res: any) => {
+    route.push("/layout/chat/" + res.payload.sessionId)
+}))
 listen("layoutClose", () => {
     appWindow.close()
 })
 
 listen("closeAllWindow", () => {
     appWindow.close()
+})
+listen("logout", () => {
+    emit("closeAllWindow")
+    login.logout().then(res => {
+    })
 })
 </script>
     

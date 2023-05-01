@@ -15,11 +15,11 @@ const baseUrl = config.backendUrl;
 export const post = async (url: string, ...data: any) => {
     let getUid = await invoke("get_login_user_id_command").then(res => res)
     commonOptions.headers.authorization = "Bearer " + localStorage.getItem(`${getUid}token`) || ''
-    
+
     const res = await fetch(baseUrl + url, {
         ...commonOptions,
         method: 'POST',
-        body: Body.json(data[0]),
+        body: data.length ? Body.json(data[0]) : undefined,
     });
     console.log(res, Body.json(data));
     return res as any;
@@ -81,7 +81,7 @@ export const upload = async (url: string, formData: any) => {
         body: Body.json(formData),
 
     });
-    
+
 
     // const total = res.headers['content-length']
 

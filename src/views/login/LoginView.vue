@@ -129,7 +129,7 @@ const onSubmit = async () => {
         return Message(flag.msg, "warning")
 
     newWindow.newWindow("layout", {
-        url: "/layout/messageList",
+        url: "/layout/sessionList",
         center: true,
         resizable: false,
         fullscreen: false,
@@ -145,6 +145,21 @@ const onSubmit = async () => {
 }
 
 const registHandler = (e: any) => {
+    //非空判断
+    if (!form.value.userName || !form.value.password || !form.value.rePassword)
+        return Message('账号或密码不能为空', "info")
+    //用户名判断
+    if (form.value.userName.length < 2 || form.value.userName.length > 12)
+        return Message('用户名长度为2-12位', "warning")
+    //性别判断
+    if (form.value.sex == '')
+        return Message('请选择性别', "warning")
+    //密码判断
+    if (form.value.password != form.value.rePassword)
+        return Message('两次密码不一致', "warning")
+    if (form.value.password.length < 6 || form.value.password.length > 12)
+        return Message('密码长度为6-12位', "warning")
+
     login.regist(form.value.userName, form.value.password, form.value.sex).then(res => {
         console.log(res);
         if (res.data.code == 200) {

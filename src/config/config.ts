@@ -15,7 +15,7 @@ export default {
             title: 'login',
         })
         setTimeout(() => {
-            emit('closeAllWindow')
+            emit('closeAllWindow',{})
         }, 100);
     }
 }
