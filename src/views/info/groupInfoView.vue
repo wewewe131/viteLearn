@@ -3,7 +3,7 @@
         <div class="left">
             <div class="info">
                 <div class="avatar">
-                    <input @change="changeAvatar" type="file" accept="image/*" style="display: none;" ref="avatar">
+                    <input @change="changeAvatar" type="file" accept=".png,.jpg" style="display: none;" ref="avatar">
                     <img @click="userRole != '3' ? showFileWindow() : ''"
                         :src="config.filePath + 'avatar/' + groupInfo.groupAvatar" height="200" width="200"
                         style="border-radius: 50%;cursor: pointer;" alt="">
@@ -137,7 +137,6 @@ function changeAvatar() {
         })
     }
 }
-
 function showFileWindow() {
     let el: HTMLInputElement = avatar.value as any
     el.click()
@@ -178,7 +177,7 @@ function toGroupHandler() {
         sessionType: "group"
     }).then(res => {
         if (res.data.code == 200) {
-            emit('tochat',res)
+            emit('tochat',res.data.data)
             console.log(res.data.data);
         }
     })
@@ -233,7 +232,6 @@ function setHostHandler(uid: string) {
         emit("reloadGroupList").then(() => {
             router.go(0)
         })
-
     })
 }
 

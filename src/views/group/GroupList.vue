@@ -10,21 +10,18 @@
         <div class="groupList">
             <div v-for="(i, index) in groupList" :key="index" class="groupGroup">
                 <div class="groupName" @click="i.show = !i.show">
-                    <!-- <div class="groupName" @click="i.show = !i.show"> -->
                     <div class="groupleft">
                         <div class="arrowBox">
                             <div :class="i.show ? 'showList' : 'hideList'" class="arrow"></div>
                         </div> {{ i.groupGroupingName }}
                     </div>
                 </div>
-
                 <div class="groupGroupList" :style="{ display: i.show ? 'initial' : 'none' }">
                     <div v-for="(j, index) in i.groupList" :key="index" @click="openGroupInfoHandler(j.groupId)"
                         class="groupGroupListItem">
                         <img :src="config.filePath + 'avatar/' + j.groupAvatar" height="50" width="50" alt="">
                         <div class="friendInfo">
                             <div>{{ j.groupName }}</div>
-                            <div>{{ j.groupDescription }}</div>
                         </div>
                     </div>
                 </div>

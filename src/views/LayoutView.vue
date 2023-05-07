@@ -43,27 +43,19 @@ let gParam = getCurrentInstance()?.appContext.config.globalProperties
 let route = useRouter()
 
 apply.getApplyInfo().then((res: any) => {
-    // console.log(res.data.data);
-
     applyList.value = res.data.data
 })
 
 getUserInfo().then(() => {
     testSocket.socket().then(res => {
-
         listen("send_socket_message", (data: any) => {
             let payload: { sendUserId: string, sendUserAvatar: string, message: string, sendUser: string, sessionId: string } = data.payload
             res.send(JSON.stringify({ "msg": payload, "mode": "message" }))
         })
-
         res.onopen = () => {
-            // console.log("连接成功");
             res.send(JSON.stringify({ "msg": "我是客户端", "mode": "test" }));
         }
-
         res.onmessage = (e) => {
-            // emit("send_socket_message", {sendUserId:'100010', sendUserAvatar:'2fa8d135-d1b0-4264-95fa-3b36f60f0825.webp',message: "新的消息", sendUser: '100010', sessionId: '300ee5d12f74dce23148103b66f37e49' })
-            // console.log("收到消息", e.data);
             let res = JSON.parse(e.data)
             console.log(res);
             if (res.type == "group" || res.type == "friend") {
@@ -79,16 +71,8 @@ getUserInfo().then(() => {
             }
             if (res.type == "message") {
                 console.log(res);
-                
                 emit("new_message", res)
             }
-        }
-
-        res.onclose = () => {
-            // console.log("连接关闭");
-        }
-        res.onerror = () => {
-            // console.log("连接错误");
         }
     })
 }
@@ -112,7 +96,8 @@ onMounted(async () => {
     emit("mainClose")
 })
 listen("tochat", ((res: any) => {
-    route.push("/layout/chat/" + res.payload.sessionId)
+    console.log(res);
+    route.push("/layout/chat/" + res.payload.id)
 }))
 listen("layoutClose", () => {
     appWindow.close()

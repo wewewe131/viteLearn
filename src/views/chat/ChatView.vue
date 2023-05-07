@@ -22,7 +22,7 @@
                 </div>
                 <div class="activeButton">
                     <MyButton @click="sendMessage">发送</MyButton>
-                    <MyButton>取消</MyButton>
+                    <MyButton @click="cancleSend">退出</MyButton>
                 </div>
             </div>
         </div>
@@ -34,7 +34,6 @@
                         <img :src="config.filePath + 'avatar/' + i.chatUser.uavatar" width="30" alt="">
                         <div class="point" :style="{ backgroundColor: i.chatUser.isOnline ? '#cbff65' : '#999' }">
                             <!-- 在线状态显示 -->
-
                         </div>
                     </div>
                     <div class="center">
@@ -62,6 +61,7 @@ import { UserInfo } from '@/stores/Store';
 import { storeToRefs } from 'pinia';
 import group from '@/api/group';
 import config from '@/config/config';
+import router from '@/router';
 
 
 let userStore = UserInfo();
@@ -97,7 +97,13 @@ onMounted(() => {
     })
 
 })
-
+function cancleSend() {
+    sessionInfo.value = { id: '', sessionType: '', receiveId: '' }
+    chatList.value = []
+    memberList.value = []
+    messageText.value = ''
+    router.push("/layout/sessionList")
+}
 interface Message {
     sendUserId: string,
     sendUserAvatar: string,

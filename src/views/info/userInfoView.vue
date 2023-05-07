@@ -97,6 +97,8 @@ function toFriendHandler() {
     }).then(res => {
         if (res.data.code == 200) {
             console.log(res.data.data);
+            emit('tochat',res.data.data)
+            console.log(res.data.data);
         }
     })
 }
@@ -113,9 +115,7 @@ async function deleteFriend() {
         friend.deleteFriend(userInfo.value.userId).then((res: any) => {
             setTimeout(() => send(), 100)
         })
-        // send()
     }
-
 }
 function changeFriendGroup() {
     friend.changeFriendGroup(userInfo.value.userId, userInfo.value.friendGroup).then((res: any) => {
