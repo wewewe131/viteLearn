@@ -3,7 +3,6 @@ import { fetch, Body } from '@tauri-apps/api/http';
 import { invoke } from '@tauri-apps/api/tauri';
 const commonOptions = {
     headers: {
-        // 'Content-Type': 'application/json',
         'authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NjkwMDI1MDgsInVzZXJJZCI6IjEwMDAxMSJ9.Xm_xHKFlhAEatLK02nhCER5aA8U6EMb6rELPbU9Hub8",
         'timeout': "30",
     },

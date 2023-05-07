@@ -3,8 +3,8 @@ import { emit } from "@tauri-apps/api/event";
 
 export default {
 
-    backendUrl: "http://localhost:8080/api",
-    filePath: "http://localhost:8080/api/file/",
+    backendUrl: "http://localhost:9007/api",
+    filePath: "http://localhost:9007/api/file/",
     logout: function logout() {
         newWindow.newWindow('login', {
             url: "/",
