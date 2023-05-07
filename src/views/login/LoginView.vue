@@ -5,7 +5,7 @@
                 <el-input v-model="form.userId"></el-input>
             </el-form-item>
             <el-form-item label="密码：" prop="password">
-                <el-input type="text" v-model="form.password"></el-input>
+                <el-input type="password" v-model="form.password"></el-input>
             </el-form-item>
             <el-form-item class="buttons">
                 <MyButton size="1.5" @click="onSubmit">登陆</MyButton>
